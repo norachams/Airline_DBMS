@@ -25,16 +25,17 @@ def index():
         cur.execute(f"SELECT * FROM {selected_table}")
         # Fetching all the data from the selected table
         data = cur.fetchall()
-        # Closing the cursor object
-        cur.close()
+        # Retrieve column names for selected table
+        cur.execute(f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{selected_table}'")
         # Rendering the 'table.html' template with the selected table name and its data
-        return render_template('table.html', table_name=selected_table, table_data=data)
+        column_names = [row[0] for row in cur.fetchall()]
+        cur.close()
+        return render_template('table.html', table_name=selected_table, table_data=data, column_names=column_names)
 
-    # Handling GET requests
-    # Listing all the available table names
-    table_names = ['address', 'airline', 'airport', 'baggage', 'baggage_type', 'customer', 'economyclass', 'firstclass', 'flights', 'flights_duration', 'flight_status', 'gates', 'payment', 'seat', 'ticket']
-    # Rendering the 'index.html' template with the available table names
+
+    table_names = ['address', 'airline', 'airport', 'baggage', 'baggage_type', 'customer', 'economyclass', 'firstclass', 'flights', 'flights_duration', 'flight_status', 'gates', 'payment', 'seat','ticket']
     return render_template('index.html', table_names=table_names)
+
 
 
 @app.route('/insert/<string:table_name>', methods=['GET', 'POST'])
